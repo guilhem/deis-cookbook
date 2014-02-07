@@ -1,8 +1,4 @@
+#source "https://api.berkshelf.com"
 site :opscode
 
 metadata
-
-cookbook 'apt'
-cookbook 'rsyslog'
-cookbook 'sudo'
-
