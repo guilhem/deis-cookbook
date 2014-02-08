@@ -1,9 +1,9 @@
-username = node.deis.username
-group = node.deis.group
+username = node['deis']['username']
+group = node['deis']['group']
 
-knife_dir = "#{node.deis.dir}/.chef"
-client_key_path = "#{knife_dir}/client.pem"
-validator_key_path = "#{knife_dir}/validator.pem"
+knife_dir = ::File.join(node['deis']['dir'], '.chef')
+client_key_path = ::File.join(knife_dir, 'client.pem')
+validator_key_path = ::File.join(knife_dir, 'validator.pem')
 
 # make validator key readable by deis user
 

@@ -2,3 +2,5 @@
 site :opscode
 
 metadata
+
+cookbook "locales", github: "optiflows-cookbooks/locales"

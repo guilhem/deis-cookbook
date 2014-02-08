@@ -1,52 +1,26 @@
-package 'postgresql-9.1'
+include_recipe 'postgresql::server'
+include_recipe 'database::postgresql'
 
-service 'postgresql' do
-  supports :status => true, :restart => true, :reload => true
-  action [ :enable, :start ]
-end
+postgresql_connection_info = {
+  :host     => '127.0.0.1',
+  :port     => node['postgresql']['config']['port'],
+  :username => 'postgres',
+  :password => node['postgresql']['password']['postgres']
+}
 
-directory '/etc/postgresql/9.1/main' do
-  owner 'postgres'
-  group 'postgres'
-  mode 0755
+postgresql_database node['deis']['database']['name'] do
+  connection postgresql_connection_info
+  template 'template0'
+  encoding 'utf8'
+  tablespace 'DEFAULT'
+  connection_limit '-1'
+  owner node['deis']['database']['user']
   action :create
 end
 
-template '/etc/postgresql/9.1/main/pg_hba.conf' do
-  source 'pg_hba.conf.erb'
-  user 'postgres'
-  group 'postgres'
-  mode 0640
-  notifies :reload, "service[postgresql]"
-end
-
-template '/etc/postgresql/9.1/main/postgresql.conf' do
-  source 'postgresql.conf.erb'
-  user 'postgres'
-  group 'postgres'
-  mode 0644
-  notifies :reload, "service[postgresql]"
-end
-
-db_name = node.deis.database.name
-db_user = node.deis.database.user
-
-execute 'create-deis-database' do
-    user 'postgres'
-    group 'postgres'
-    db_exists = <<-EOF
-    psql -c "select * from pg_database WHERE datname='#{db_name}'" | grep -c #{db_name}
-    EOF
-    command "createdb --encoding=utf8 --template=template0 #{db_name}"
-    not_if db_exists, :user => 'postgres'
-end
-
-execute 'create-deis-database-user' do
-    user 'postgres'
-    group 'postgres'
-    user_exists = <<-EOF
-    psql -c "select * from pg_user where usename='#{db_user}'" | grep -c #{db_user}
-    EOF
-    command "createuser --no-superuser --no-createrole --no-createdb --no-password #{db_user}"
-    not_if user_exists, :user => 'postgres'
+postgresql_database_user node['deis']['database']['user'] do
+  connection    postgresql_connection_info
+  database_name node['deis']['database']['name']
+  privileges    [:all]
+  action        :create
 end
