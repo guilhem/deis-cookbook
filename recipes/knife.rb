@@ -40,4 +40,3 @@ file "#{knife_dir}/knife.rb" do
   mode 0600
   content File.read('/etc/chef/client.rb')
 end
-

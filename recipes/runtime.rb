@@ -27,12 +27,12 @@ bash 'create-slugrunner-image' do
   not_if 'docker images | grep deis/slugrunner'
 end
 
-# TODO: add back when https://github.com/dotcloud/docker/issues/643 is fixed 
-#bash 'clear-docker-containers' do
+# TODO: add back when https://github.com/dotcloud/docker/issues/643 is fixed
+# bash 'clear-docker-containers' do
 #  code 'docker rm `docker ps -a -q`'
 #  action :nothing
 #  subscribes :run, 'bash[create-slugrunner-image]', :immediately
-#end
+# end
 
 package 'curl'
 
@@ -41,35 +41,35 @@ formations = data_bag('deis-formations')
 services = []
 active_slug_paths = []
 formations.each do |f|
-  
+
   formation = data_bag_item('deis-formations', f)
 
   # skip this node if it's not part of this formation
-  next if ! formation['nodes'].keys.include? node.name
+  next unless formation['nodes'].keys.include(node.name)
   # skip this node if it's not part of the runtime
-  next if formation['nodes'][node.name]['runtime'] != true
-  
+  next unless formation['nodes'][node.name]['runtime'] == true
+
   formation['apps'].each_pair do |app_id, app|
-    
+
     # skip this app if there's an empty release or build
     next if app['release'] == {}
     next if app['release']['build'] == {}
-    
+
     version = app['release']['version']
     build = app['release']['build']
     config = app['release']['config']
-    
+
     # if build is specified, use special heroku-style runtime
-    
-    if build.has_key? 'url'
-    
+
+    if build.key? 'url'
+
       slug_url = build['url']
-      
+
       # download the slug to a tempdir
       slug_root = node.deis.runtime.slug_dir
       slug_path = "#{slug_root}/#{app_id}-v#{version}.tar.gz"
       slug_dir = "#{slug_root}/#{app_id}-v#{version}"
-      
+
       bash "download-slug-#{app_id}-#{version}" do
         cwd slug_root
         code <<-EOF
@@ -87,24 +87,24 @@ formations.each do |f|
       active_slug_paths.push("#{app_id}-v#{version}")
 
     end
-  
+
     # iterate over this application's process formation by
     # Procfile-defined type
-    
+
     app['containers'].each_pair do |c_type, c_formation|
-      
+
       c_formation.each_pair do |c_num, node_port|
-      
+
         nodename, port = node_port.split(':')
-        
+
         next if nodename != node.name
 
-        # determine build command, if one exists
-        if build != {}
-          command = build['procfile'][c_type]
-        else
-          command = nil # assume command baked into docker image
-        end
+#         # determine build command, if one exists
+#         if build != {}
+#           command = build['procfile'][c_type]
+#         else
+#           command = nil # assume command baked into docker image
+#         end
         name = "#{app_id}.#{c_type}.#{c_num}"
         # define the container
         container name do
@@ -121,7 +121,6 @@ formations.each do |f|
     end
   end # formations['apps'].each
 end # formations.each
-
 
 # remove old slug dirs
 slug_root = node.deis.runtime.slug_dir
@@ -140,10 +139,9 @@ if Dir.exists?(slug_root)
   end
 end
 
-
-# 
+#
 # # purge old container services
-# 
+#
 targets = []
 Dir.glob("/etc/init/deis-*").each do |path|
   svc = File.basename(path, '.conf')
@@ -160,17 +158,17 @@ Dir.glob("/etc/init/deis-*").each do |path|
   targets.push([s, f])
 end
 
-if ! targets.empty?
+unless targets.empty?
   Thread.abort_on_exception = true
   ruby_block "stop-services-in-parallel" do
     block do
       threads = []
-      targets.each { |s, f|
-        threads << Thread.new { |t| 
+      targets.each do |s, f|
+        threads << Thread.new do |t|
           s.run_action(:stop)
           f.run_action(:delete)
-        }
-      }
+        end
+      end
       threads.each { |t| t.join }
     end
   end

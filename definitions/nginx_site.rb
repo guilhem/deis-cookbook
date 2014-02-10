@@ -4,7 +4,7 @@ define :nginx_site, :name => nil, :template => nil, :vars => {} do
   name = params[:name]
   template = params[:template]
   vars = params[:vars]
-  
+
   template "/etc/nginx/sites-available/#{name}" do
     source template
     mode 0644
@@ -13,7 +13,7 @@ define :nginx_site, :name => nil, :template => nil, :vars => {} do
     # are respected, for now port changes are ignored
     notifies :restart, "service[nginx]", :delayed
   end
-  
+
   link "/etc/nginx/sites-enabled/#{name}" do
     to "/etc/nginx/sites-available/#{name}"
     action :create

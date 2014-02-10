@@ -7,11 +7,11 @@
 # All rights reserved - Do Not Redistribute
 #
 
-gitosis_dir = node.deis.gitosis.dir
-gitosis_checkout = "#{gitosis_dir}/checkout"
-gitosis_admin_repo = "#{gitosis_dir}/repositories/gitosis-admin.git"
-gitosis_admin_checkout = "#{gitosis_dir}/gitosis-admin"
-gitosis_key_dir = "#{gitosis_admin_checkout}/keydir"
+gitosis_dir = node['deis']['gitosis']['dir']
+gitosis_checkout = ::File.join(gitosis_dir, 'checkout')
+gitosis_admin_repo = ::File.join(gitosis_dir, 'repositories', 'gitosis-admin.git')
+gitosis_admin_checkout = ::File.join(gitosis_dir, 'gitosis-admin')
+gitosis_key_dir = ::File.join(gitosis_admin_checkout, 'keydir')
 
 # create git user
 
@@ -39,7 +39,6 @@ execute 'set-docker-sock-perms' do
   action :run
 end
 
-
 # allow the git user to run a hook that creates
 # a new build & release via local python code
 
@@ -47,8 +46,8 @@ sudo 'git' do
   user  'git'
   runas node.deis.username
   nopasswd  true
-  commands [ node.deis.controller.dir + '/bin/pre-push-hook',
-             node.deis.controller.dir + '/bin/push-hook', ]
+  commands [node['deis']['controller']['dir'] + '/bin/pre-push-hook',
+            node['deis']['controller']['dir'] + '/bin/push-hook']
 end
 
 # synchronize the gitosis repository
@@ -60,8 +59,8 @@ directory gitosis_dir do
 end
 
 git gitosis_checkout do
-  repository node.deis.gitosis.repository
-  revision node.deis.gitosis.revision
+  repository node['deis']['gitosis']['repository']
+  revision node['deis']['gitosis']['revision']
   action :sync
 end
 
@@ -99,7 +98,7 @@ end
 # use the deis-users databag to construct a directory of ssh keys:
 # perms['users'][username] => [ {username}_{key1}, {username}_{key2} ]
 
-perms = {'users' => {}, 'apps' => {}}
+perms = { 'users' => {}, 'apps' => {} }
 key_paths = []  # keep track of valid key paths for purge
 
 data_bag('deis-users').each do |username|
@@ -175,11 +174,11 @@ template "#{gitosis_admin_checkout}/gitosis.conf" do
   user 'git'
   group 'git'
   source 'gitosis.conf.erb'
-  variables({
+  variables(
     :admins => ['gitosis-admin'],
     :apps => perms['apps'],
     :slugbuilder_path => node.deis.controller.dir + '/bin/slugbuilder-hook.py'
-  })
+  )
   notifies :run, 'bash[git-commit-gitosis-admin]'
 end
 

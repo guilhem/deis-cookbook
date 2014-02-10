@@ -14,7 +14,7 @@ define :authorized_keys_for, :name => nil, :group => nil, :home => nil, :keys =>
       action :create
       only_if "test -d #{home}"
     end
-    
+
     file "#{home}/.ssh/authorized_keys" do
       owner user
       group group

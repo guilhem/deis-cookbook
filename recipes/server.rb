@@ -169,4 +169,3 @@ nginx_site 'deis-controller' do
        :slug_root => node.deis.build.slug_dir,
        :http_port => node.deis.controller.http_port
 end
-

@@ -1,3 +1,4 @@
+node.set['postgresql']['enable_pgdg_apt'] = true
 include_recipe 'postgresql::server'
 include_recipe 'database::postgresql'
 

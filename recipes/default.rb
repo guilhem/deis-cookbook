@@ -1,5 +1,5 @@
 include_recipe 'deis::_common'
-#include_recipe 'deis::knife'
+# include_recipe 'deis::knife'
 include_recipe 'deis::postgresql'
 include_recipe 'deis::server'
 include_recipe 'deis::build'
