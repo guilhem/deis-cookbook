@@ -1,12 +1,12 @@
 define :container, :c_type => nil, :c_num => nil, :env => {}, :port => nil, :image => nil, :app_name => nil, :command => nil do # ~FC037
 
   service_name = "deis-#{params[:name]}"
-  
+
   # create upstart service definition
   template "/etc/init/#{service_name}.conf" do # ~FC037
-    source "container.conf.erb"
+    source 'container.conf.erb'
     mode 0644
-    variables({
+    variables(
       :app_name => params[:app_name],
       :name => params[:name],
       :image => params[:image],
@@ -15,8 +15,8 @@ define :container, :c_type => nil, :c_num => nil, :env => {}, :port => nil, :ima
       :port => params[:port],
       :c_type => params[:c_type],
       :c_num => params[:c_num],
-      :command => params[:command],
-    })
+      :command => params[:command]
+    )
     # stop the service to force job definition reload
     notifies :stop, "service[#{service_name}]", :immediately
   end

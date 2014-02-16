@@ -30,8 +30,8 @@ end
 
 ruby_block 'wait-for-discovery' do
   block do
-    Connect.wait_tcp(node.deis.public_ip, node.deis.etcd.port, seconds=30)
-    Connect.wait_http("http://#{node.deis.public_ip}:#{node.deis.etcd.port}/version", seconds=30)
+    Connect.wait_tcp(node.deis.public_ip, node.deis.etcd.port, seconds = 30)
+    Connect.wait_http("http://#{node.deis.public_ip}:#{node.deis.etcd.port}/version", seconds = 30)
   end
 end
 
@@ -45,7 +45,7 @@ ruby_block 'publish-chef-config' do
     client.set('/deis/chef/validationName', "#{Chef::Config[:validation_client_name]}")
     client.set('/deis/chef/validationKey', "#{Base64.strict_encode64(File.read(Chef::Config[:validation_key]))}")
   end
-  not_if {
+  not_if do
     begin
       client = Etcd.client(host: node.deis.public_ip, port: node.deis.etcd.port)
       client.get('/deis/chef')
@@ -53,5 +53,5 @@ ruby_block 'publish-chef-config' do
     rescue Net::HTTPServerException, Net::HTTPFatalError
       false
     end
-  }
+  end
 end

@@ -21,7 +21,7 @@ package 'nginx'
 
 link '/etc/nginx/sites-enabled/default' do
   action :delete
-  notifies :restart, "service[nginx]", :delayed
+  notifies :restart, 'service[nginx]', :delayed
 end
 
 template '/etc/nginx/nginx.conf' do
@@ -29,7 +29,7 @@ template '/etc/nginx/nginx.conf' do
   group 'root'
   mode 0644
   source 'nginx.conf.erb'
-  notifies :restart, "service[nginx]", :delayed
+  notifies :restart, 'service[nginx]', :delayed
 end
 
 service 'nginx' do

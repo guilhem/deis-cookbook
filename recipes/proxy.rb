@@ -15,14 +15,14 @@ formations = data_bag('deis-formations')
 
 config_files = []  # keep track of nginx config files
 formations.each do |f|
-  
+
   formation = data_bag_item('deis-formations', f)
-  
+
   # skip this node if it's not part of this formation
-  next if ! formation['nodes'].keys.include? node.name
+  next if !formation['nodes'].keys.include? node.name
   # skip this node if it's not a proxy
   next if formation['nodes'][node.name]['proxy'] != true
-  
+
   formation['apps'].each_pair do |app_id, app|
 
     proxy = app['proxy']
@@ -32,14 +32,14 @@ formations.each do |f|
     else
       server_name = "#{app_id}.#{formation['domain']}"
     end
-    
-    vars = {:server_name => server_name,
-            :app => app_id,
-            :port => proxy['port'],
-            :backends => proxy['backends'], 
-            :algorithm => proxy['algorithm'],
-            :firewall => proxy['firewall']}
-  
+
+    vars = { :server_name => server_name,
+             :app => app_id,
+             :port => proxy['port'],
+             :backends => proxy['backends'],
+             :algorithm => proxy['algorithm'],
+             :firewall => proxy['firewall'] }
+
     config_file = "deis-#{app_id}"
     nginx_site config_file do
       template 'nginx-proxy.conf.erb'
@@ -47,7 +47,7 @@ formations.each do |f|
     end
     config_files.push(config_file)
   end
-  
+
 end
 
 # purge old nginx configs
@@ -55,11 +55,11 @@ end
 ['/etc/nginx/sites-enabled', '/etc/nginx/sites-available'].each do |dir|
   Dir.glob("#{dir}/*").each do |path|
     f = File.basename path
-    next if ! f.start_with? 'deis-'
+    next if !f.start_with? 'deis-'
     next if config_files.include? f
     file path do
       action :delete
-      notifies :restart, "service[nginx]", :delayed
+      notifies :restart, 'service[nginx]', :delayed
     end
-  end  
+  end
 end

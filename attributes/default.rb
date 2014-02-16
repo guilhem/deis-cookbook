@@ -73,7 +73,7 @@ default.deis.builder.source = '/vagrant/images/builder'
 default.deis.builder.container = 'deis-builder'
 default.deis.builder.port = 2222
 # change nil to target diractory to sync buildpacks from github
-default.deis.builder.packs = nil #'/var/lib/deis/buildpacks'
+default.deis.builder.packs = nil # '/var/lib/deis/buildpacks'
 
 # logger
 default.deis.logger.image = 'deis/logger:v0.1.0'

@@ -4,11 +4,10 @@ require 'socket'
 require 'timeout'
 
 class Chef::Recipe::Connect
-
-  def self.wait_tcp(ip, port, seconds=30)
+  def self.wait_tcp(ip, port, seconds = 30)
     begin
-      Timeout::timeout(seconds) do
-        while true do
+      Timeout.timeout(seconds) do
+        while true
           begin
             Chef::Log.debug("Trying connection to #{ip}:#{port}!")
             TCPSocket.new(ip, port).close
@@ -22,21 +21,21 @@ class Chef::Recipe::Connect
         end
       end
     rescue Timeout::Error => e
-      raise  
+      raise
     end
   end
 
-  def self.wait_http(u, seconds=30)
+  def self.wait_http(u, seconds = 30)
     begin
-      Timeout::timeout(seconds) do
+      Timeout.timeout(seconds) do
         url = URI.parse(u)
-        while true do
+        while true
           Chef::Log.debug("Trying connection to #{url}")
           req = Net::HTTP::Get.new(url.to_s)
           begin
-            res = Net::HTTP.start(url.host, url.port) {|http|
+            res = Net::HTTP.start(url.host, url.port) do|http|
               http.request(req)
-            }
+            end
             if res.code == '200'
               return
             end
@@ -50,5 +49,4 @@ class Chef::Recipe::Connect
       raise
     end
   end
-    
 end

@@ -18,7 +18,7 @@ docker_container node.deis.builder.container do
   privileged true
   env ["ETCD=#{node.deis.public_ip}:#{node.deis.etcd.port}",
        "HOST=#{node.deis.public_ip}",
-       "PORT=22"]
+       'PORT=22']
   image node.deis.builder.image
   port "#{node.deis.builder.port}:22"
   volume VolumeHelper.builder(node)
@@ -42,7 +42,7 @@ if node.deis.builder.packs != nil
    'heroku-buildpack-perl' => ['https://github.com/miyagawa/heroku-buildpack-perl.git', 'carton'],
   }
 
-  buildpacks.each_pair { |path, repo|
+  buildpacks.each_pair do |path, repo|
     url, rev = repo
     git "#{node.deis.builder.packs}/#{path}" do
       user node.deis.username
@@ -51,13 +51,13 @@ if node.deis.builder.packs != nil
       revision rev
       action :sync
     end
-  }
+  end
 
 end
 
 ruby_block 'wait-for-builder' do
   block do
     EtcdHelper.wait_for_key(node.deis.public_ip, node.deis.etcd.port,
-                            '/deis/builder/host', seconds=300)
+                            '/deis/builder/host', seconds = 300)
   end
 end
