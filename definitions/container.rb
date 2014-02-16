@@ -1,4 +1,4 @@
-define :container, :c_type => nil, :c_num => nil, :env => {}, :port => nil, :image => nil, :app_name => nil, :command => nil do # ~FC037
+define :container, :c_type => nil, :c_num => nil, :env => {}, :port => nil, :image => nil, :app_name => nil, :command => nil do # ~FC037 ~FC015
 
   service_name = "deis-#{params[:name]}"
 
@@ -10,7 +10,6 @@ define :container, :c_type => nil, :c_num => nil, :env => {}, :port => nil, :ima
       :app_name => params[:app_name],
       :name => params[:name],
       :image => params[:image],
-      :slug_dir => params[:slug_dir],
       :env => params[:env],
       :port => params[:port],
       :c_type => params[:c_type],
@@ -22,7 +21,7 @@ define :container, :c_type => nil, :c_num => nil, :env => {}, :port => nil, :ima
   end
 
   # define an upstart daemon as enabled or disabled
-  service "#{service_name}" do
+  service service_name do
     provider Chef::Provider::Service::Upstart
     action [:enable, :start]
   end

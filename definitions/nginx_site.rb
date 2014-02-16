@@ -1,5 +1,4 @@
-
-define :nginx_site, :name => nil, :template => nil, :vars => {} do
+define :nginx_site, :name => nil, :template => nil, :vars => {} do # ~FC015
 
   name = params[:name]
   template = params[:template]
