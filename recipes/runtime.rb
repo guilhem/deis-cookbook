@@ -3,15 +3,14 @@ include_recipe 'rsyslog::client'
 formations = data_bag('deis-formations')
 
 services = []
-active_slug_paths = []
 formations.each do |f|
 
   formation = data_bag_item('deis-formations', f)
 
   # skip this node if it's not part of this formation
-  next if !formation['nodes'].keys.include? node.name
+  next unless formation['nodes'].keys.include? node.name
   # skip this node if it's not part of the runtime
-  next if formation['nodes'][node.name]['runtime'] != true
+  next if formation['nodes'][node.name]['runtime'] == true
 
   formation['apps'].each_pair do |app_id, app|
 
@@ -19,7 +18,7 @@ formations.each do |f|
     next if app['release'] == {}
     next if app['release']['build'] == {}
 
-    version = app['release']['version']
+    # Not used version = app['release']['version']
     build = app['release']['build']
     config = app['release']['config']
     image = build['image']
@@ -35,7 +34,7 @@ formations.each do |f|
         next if nodename != node.name
 
         # determine build command, if one exists
-        if build['procfile'] != nil and build['procfile'].key? c_type
+        if !build['procfile'].nil? && build['procfile'].key?(c_type)
           command = "start #{c_type}"
         else
           command = nil
@@ -76,18 +75,17 @@ Dir.glob('/etc/init/deis-*').each do |path|
   targets.push([s, f])
 end
 
-if !targets.empty?
-  Thread.abort_on_exception = true
-  ruby_block 'stop-services-in-parallel' do
-    block do
-      threads = []
-      targets.each do |s, f|
-        threads << Thread.new do |t|
-          s.run_action(:stop)
-          f.run_action(:delete)
-        end
+ruby_block 'stop-services-in-parallel' do
+  block do
+    Thread.abort_on_exception = true
+    threads = []
+    targets.each do |s, f|
+      threads << Thread.new do |t|
+        s.run_action(:stop)
+        f.run_action(:delete)
       end
-      threads.each { |t| t.join }
     end
+    threads.each { |t| t.join }
   end
+  not_if { targets.empty? }
 end

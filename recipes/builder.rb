@@ -1,10 +1,9 @@
 
-if node.deis.builder.packs != nil
-  directory node.deis.builder.packs do
-    user node.deis.username
-    group node.deis.group
-    mode 0755
-  end
+directory node.deis.builder.packs do
+  user node.deis.username
+  group node.deis.group
+  mode 0755
+  not_if { node.deis.builder.packs.nil? }
 end
 
 docker_image node.deis.builder.image do
@@ -26,7 +25,7 @@ docker_container node.deis.builder.container do
 end
 
 # synchronize buildpacks to use during slugbuilder execution
-if node.deis.builder.packs != nil
+unless node.deis.builder.packs.nil?
 
   buildpacks = {
    'heroku-buildpack-java' => ['https://github.com/heroku/heroku-buildpack-java.git', 'master'],
@@ -57,7 +56,11 @@ end
 
 ruby_block 'wait-for-builder' do
   block do
-    EtcdHelper.wait_for_key(node.deis.public_ip, node.deis.etcd.port,
-                            '/deis/builder/host', seconds = 300)
+    EtcdHelper.wait_for_key(
+      node.deis.public_ip,
+      node.deis.etcd.port,
+      '/deis/builder/host',
+      300
+    )
   end
 end

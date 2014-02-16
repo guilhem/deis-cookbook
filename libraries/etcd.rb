@@ -8,11 +8,11 @@ class Chef::Recipe::EtcdHelper
     client = Etcd.client(host: host, port: port)
     begin
       Timeout.timeout(seconds) do
-        while true
+        loop do
           begin
             client.get(k)
             break
-          rescue => e
+          rescue
             sleep 1
             next
           end

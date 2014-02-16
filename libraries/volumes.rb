@@ -2,9 +2,7 @@
 class Chef::Recipe::VolumeHelper
   def self.builder(node)
     mounts = []
-    if node.deis.builder.packs != nil
-      mounts << "#{node.deis.builder.packs}:/buildpacks"
-    end
+    mounts << "#{node.deis.builder.packs}:/buildpacks" unless node.deis.builder.packs.nil?
     if node.deis.dev.mode == true
       mounts << "#{File.join(node.deis.dev.source, 'images/builder')}:/app"
     end
@@ -75,9 +73,7 @@ class Chef::Recipe::VolumeHelper
         "#{File.join(node.deis.dev.source, 'images/worker/bin')}:/app/bin",
         "#{File.join(node.deis.dev.source, 'images/worker/conf.d')}:/app/conf.d",
         "#{File.join(node.deis.dev.source, 'images/worker/templates')}:/app/templates"]
-      if File.exist?('/home/vagrant')
-        mounts << '/home/vagrant:/home/vagrant'
-      end
+      mounts << '/home/vagrant:/home/vagrant' if File.exist?('/home/vagrant')
     end
     mounts
   end
