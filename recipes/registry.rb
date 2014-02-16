@@ -37,6 +37,6 @@ end
 ruby_block 'wait-for-registry' do
   block do
     EtcdHelper.wait_for_key(node.deis.public_ip, node.deis.etcd.port,
-                            '/deis/registry/host', seconds=60)
+                            '/deis/registry/host', seconds = 60)
   end
 end

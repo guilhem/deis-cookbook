@@ -1,6 +1,5 @@
 
 class Chef::Recipe::VolumeHelper
-
   def self.builder(node)
     mounts = []
     if node.deis.builder.packs != nil
@@ -29,7 +28,7 @@ class Chef::Recipe::VolumeHelper
   end
 
   def self.database_data(node)
-    ["/var/lib/postgresql"]
+    ['/var/lib/postgresql']
   end
 
   def self.logger(node)
@@ -51,9 +50,9 @@ class Chef::Recipe::VolumeHelper
   end
 
   def self.registry_data(node)
-    ["/data"]
+    ['/data']
   end
-  
+
   def self.server(node)
     # share log directory between server and logger components
     # TODO: replace with a distributed mechanism for populating `deis logs`
@@ -63,7 +62,7 @@ class Chef::Recipe::VolumeHelper
         "#{node.deis.dev.source}:/app/deis",
         "#{File.join(node.deis.dev.source, 'images/server/bin')}:/app/bin",
         "#{File.join(node.deis.dev.source, 'images/server/conf.d')}:/app/conf.d",
-        "#{File.join(node.deis.dev.source, 'images/server/templates')}:/app/templates" ]
+        "#{File.join(node.deis.dev.source, 'images/server/templates')}:/app/templates"]
     end
     mounts
   end
@@ -75,7 +74,7 @@ class Chef::Recipe::VolumeHelper
         "#{node.deis.dev.source}:/app/deis",
         "#{File.join(node.deis.dev.source, 'images/worker/bin')}:/app/bin",
         "#{File.join(node.deis.dev.source, 'images/worker/conf.d')}:/app/conf.d",
-        "#{File.join(node.deis.dev.source, 'images/worker/templates')}:/app/templates" ]
+        "#{File.join(node.deis.dev.source, 'images/worker/templates')}:/app/templates"]
       if File.exist?('/home/vagrant')
         mounts << '/home/vagrant:/home/vagrant'
       end
