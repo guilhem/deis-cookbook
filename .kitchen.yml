@@ -1,0 +1,17 @@
+---
+driver:
+#  name: docker
+  name: vagrant
+
+provisioner:
+  name: chef_zero
+
+platforms:
+  - name: ubuntu-12.04
+
+suites:
+  - name: default
+    run_list:
+      - recipe[deis::default]
+    attributes:
+    data_bags_path: "test/integration/default/data_bags"
