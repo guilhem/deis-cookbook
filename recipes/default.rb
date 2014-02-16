@@ -34,13 +34,13 @@ include_recipe 'docker'
 # boot properly. To working around this in a way that doesn't mean maintaining a custom docker recipe
 # we just use sed to replace the 'start on' stanza.
 if node.deis.dev.mode == true
-  bash "patch_docker_upstart_start_event" do
-   user "root"
-   code <<-EOF
+  bash 'patch_docker_upstart_start_event' do
+    user 'root'
+    code <<-EOF
       sed -i '/start on.*/c\\start on filesystem and vagrant-mounted and started lxc-net' /etc/init/docker.conf
-   EOF
-   not_if "grep -q vagrant-mounted /etc/init/docker.conf"
- end
+    EOF
+    not_if 'grep -q vagrant-mounted /etc/init/docker.conf'
+  end
 end
 
 # install required packages
@@ -49,9 +49,7 @@ package 'git'
 package 'make'
 
 # set public ip via Ohai if not defined
-if node.deis.public_ip == nil
-  node.default.deis.public_ip = node.ipaddress
-end
+node.default.deis.public_ip = node.ipaddress if node.deis.public_ip.nil?
 
 # create deis user with ssh access, auth keys
 # and the ability to run 'sudo chef-client'

@@ -19,7 +19,7 @@ formations.each do |f|
   formation = data_bag_item('deis-formations', f)
 
   # skip this node if it's not part of this formation
-  next if !formation['nodes'].keys.include? node.name
+  next unless formation['nodes'].keys.include? node.name
   # skip this node if it's not a proxy
   next if formation['nodes'][node.name]['proxy'] != true
 
@@ -55,7 +55,7 @@ end
 ['/etc/nginx/sites-enabled', '/etc/nginx/sites-available'].each do |dir|
   Dir.glob("#{dir}/*").each do |path|
     f = File.basename path
-    next if !f.start_with? 'deis-'
+    next unless f.start_with? 'deis-'
     next if config_files.include? f
     file path do
       action :delete

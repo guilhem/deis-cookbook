@@ -20,7 +20,11 @@ end
 
 ruby_block 'wait-for-cache' do
   block do
-    EtcdHelper.wait_for_key(node.deis.public_ip, node.deis.etcd.port,
-                            '/deis/cache/host', seconds = 30)
+    EtcdHelper.wait_for_key(
+      node.deis.public_ip,
+      node.deis.etcd.port,
+      '/deis/cache/host',
+      30
+    )
   end
 end
