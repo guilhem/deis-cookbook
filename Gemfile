@@ -1,17 +1,14 @@
 source 'https://rubygems.org'
 
-gem 'chef', '~> 11'
-gem 'berkshelf', '~> 2.0.14'
-gem 'knife-ec2'
+gem 'rake'
 
 group :test do
-  gem 'strainer', '~> 3.3.0'
-  gem 'rubocop'
-  gem 'foodcritic', '~> 3.0.3'
+  gem 'foodcritic', '~> 3.0'
+  gem 'rubocop', '~> 0.18'
 end
 
 group :integration do
-  gem 'test-kitchen'
-  gem 'kitchen-vagrant'
-  gem 'kitchen-docker'
+  gem 'berkshelf'
+  gem 'test-kitchen', '~> 1.1'
+  gem 'kitchen-vagrant', '~> 0.13'
 end

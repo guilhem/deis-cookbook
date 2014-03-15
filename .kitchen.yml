@@ -1,6 +1,5 @@
 ---
 driver:
-#  name: docker
   name: vagrant
 
 provisioner:
